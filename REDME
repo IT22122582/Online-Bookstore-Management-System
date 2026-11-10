@@ -1,0 +1,43 @@
+# Athena LMS
+
+A web-based library management system built with Spring Boot, Thymeleaf, and MySQL. It provides a dashboard for managing books, authors, users, loans, and reviews.
+
+## Features
+
+- Browse and manage books, including printed books and e-books
+- Manage authors and users
+- Record and manage book loans and returns
+- View reader reviews
+- Store application data in MySQL
+- Import existing records from the `data/*.txt` files when the database tables are empty
+
+## Requirements
+
+- Java 8 or later
+- MySQL Server
+
+## Setup and run
+
+1. Create the database in MySQL, or use a MySQL account that can create it:
+
+   ```sql
+   CREATE DATABASE library_management CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+   ```
+
+2. Configure the database connection. The defaults are `localhost:3306`, database `library_management`, username `root`, and an empty password. Override them with environment variables if needed:
+
+   ```sh
+   export DB_URL='jdbc:mysql://localhost:3306/library_management?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC'
+   export DB_USERNAME='your_mysql_user'
+   export DB_PASSWORD='your_mysql_password'
+   ```
+
+3. From the project directory, start the application:
+
+   ```sh
+   ./mvnw spring-boot:run
+   ```
+
+4. Open [http://localhost:8082](http://localhost:8082).
+
+The application creates its tables on startup. On the first run, it imports matching records from `data/*.txt` when the corresponding tables are empty. More database setup details are in [MYSQL_SETUP.md](MYSQL_SETUP.md).
