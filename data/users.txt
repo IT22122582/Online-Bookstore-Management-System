@@ -1,0 +1,3 @@
+U001|admin|admin123|admin@library.com|ADMIN|SUPER
+U003|jane_smith|pass456|jane@example.com|REGULAR|STANDARD
+U156000|alice_test|password123|alice@test.com|REGULAR|PREMIUM

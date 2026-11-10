@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feedback & Reviews - Athena LMS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        outfit: ['Outfit', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen font-sans">
+    
+    <!-- Top Navigation Bar -->
+    <nav class="sticky top-0 z-50 glass-panel border-b border-slate-800 px-6 py-4">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <div class="bg-gradient-to-tr from-indigo-500 to-violet-500 p-2.5 rounded-xl shadow-lg shadow-indigo-500/20">
+                    <i class="fa-solid fa-book-open text-white text-xl"></i>
+                </div>
+                <a href="/" class="text-2xl font-bold font-outfit bg-gradient-to-r from-indigo-400 via-violet-400 to-pink-400 bg-clip-text text-transparent">Athena LMS</a>
+            </div>
+            <div class="hidden md:flex space-x-1">
+                <a href="/" class="px-4 py-2 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white font-medium transition duration-200"><i class="fa-solid fa-chart-line mr-2"></i>Dashboard</a>
+                <a href="/users" class="px-4 py-2 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white font-medium transition duration-200"><i class="fa-solid fa-users mr-2"></i>Users</a>
+                <a href="/books" class="px-4 py-2 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white font-medium transition duration-200"><i class="fa-solid fa-book-bookmark mr-2"></i>Books</a>
+                <a href="/authors" class="px-4 py-2 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white font-medium transition duration-200"><i class="fa-solid fa-feather mr-2"></i>Authors</a>
+                <a href="/borrow" class="px-4 py-2 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white font-medium transition duration-200"><i class="fa-solid fa-handshake mr-2"></i>Loans</a>
+                <a href="/reviews" class="px-4 py-2 rounded-lg bg-indigo-600 text-white font-medium transition duration-200"><i class="fa-solid fa-star-half-stroke mr-2"></i>Reviews</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main class="max-w-7xl mx-auto px-6 py-10 space-y-8">
+        
+        <!-- Section Header -->
+        <div>
+            <h1 class="text-3xl font-extrabold font-outfit text-white">Reviews & Feedback</h1>
+            <p class="text-slate-400 text-sm">Submit public review blogs or verified borrower reviews, moderate reviews, and evaluate ratings.</p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            
+            <!-- Submit Review Form Panel -->
+            <div class="glass-panel rounded-3xl p-6 h-fit space-y-6">
+                <h2 class="text-xl font-bold font-outfit text-white"><i class="fa-solid fa-feather mr-2 text-indigo-500"></i>Write Book Review</h2>
+                
+                <form action="/reviews/add" method="post" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">User Submitting</label>
+                        <select name="userId" required class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-3 text-slate-200 focus:outline-none focus:border-indigo-500">
+                            <option value="">-- Select Member --</option>
+                            <option th:each="user : ${users}" th:value="${user.id}" th:text="${user.username} + ' (' + ${user.id} + ')'">User</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Book Reviewed</label>
+                        <select name="bookId" required class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-3 text-slate-200 focus:outline-none focus:border-indigo-500">
+                            <option value="">-- Select Book --</option>
+                            <option th:each="book : ${books}" th:value="${book.id}" th:text="${book.title} + ' (' + ${book.id} + ')'">Book</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Rating (Stars)</label>
+                        <select name="rating" required class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-3 text-slate-200 focus:outline-none focus:border-indigo-500">
+                            <option value="5">⭐⭐⭐⭐⭐ (5/5)</option>
+                            <option value="4">⭐⭐⭐⭐ (4/5)</option>
+                            <option value="3">⭐⭐⭐ (3/5)</option>
+                            <option value="2">⭐⭐ (2/5)</option>
+                            <option value="1">⭐ (1/5)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Feedback Comment</label>
+                        <textarea name="comment" required placeholder="Write your honest thoughts about the book here..." 
+                                  class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-3 text-slate-200 focus:outline-none focus:border-indigo-500 h-28 resize-none"></textarea>
+                        <p class="text-[10px] text-slate-500 mt-1">If the system finds a borrowing record for this user and book, the review will be published with a Verified Borrower Badge automatically.</p>
+                    </div>
+
+                    <button type="submit" class="w-full py-3 rounded-xl bg-gradient-to-r from-indigo-500 to-violet-600 text-white font-semibold hover:from-indigo-600 hover:to-violet-700 shadow-lg shadow-indigo-500/20 transition duration-200">
+                        Publish Review
+                    </button>
+                </form>
+            </div>
+
+            <!-- Reviews Feed Panel -->
+            <div class="lg:col-span-2 space-y-6">
+                <h2 class="text-xl font-bold font-outfit text-white"><i class="fa-solid fa-star-half-stroke mr-2 text-indigo-500"></i>Published Feedback Log</h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div th:each="rev : ${reviews}" class="glass-panel rounded-3xl p-6 border border-slate-800 flex flex-col justify-between space-y-4 hover:border-slate-700/60 transition duration-200">
+                        <div class="space-y-3">
+                            <div class="flex justify-between items-start">
+                                <span class="px-2.5 py-0.5 rounded text-[10px] font-bold tracking-wide uppercase" 
+                                      th:classappend="${rev.class.simpleName == 'VerifiedReview' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-slate-700/30 text-slate-450 border border-slate-800'}"
+                                      th:text="${rev.getReviewBadge()}">Public Review</span>
+                                
+                                <div class="flex text-amber-400 text-xs">
+                                    <i class="fa-solid fa-star" th:each="i : ${#numbers.sequence(1, rev.rating)}"></i>
+                                </div>
+                            </div>
+                            
+                            <p class="text-slate-200 text-sm italic font-medium" th:text="'&ldquo;' + ${rev.comment} + '&rdquo;'">&ldquo;Comment&rdquo;</p>
+                        </div>
+                        
+                        <div class="flex justify-between items-center text-xs text-slate-450 border-t border-slate-850/60 pt-3">
+                            <div>
+                                <p th:text="'User: ' + ${rev.userId}">User ID</p>
+                                <p th:text="'Book: ' + ${rev.bookId}">Book ID</p>
+                            </div>
+                            <a th:href="@{'/reviews/delete/' + ${rev.id}}" 
+                               onclick="return confirm('Are you sure you want to delete this review?')" 
+                               class="text-rose-400 hover:text-rose-350 p-2 hover:bg-rose-500/5 rounded-lg transition duration-150">
+                                <i class="fa-solid fa-trash-can" aria-hidden="true"></i>
+                                <span class="sr-only">Delete review</span>
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <div th:if="${reviews.empty}" class="col-span-full glass-panel rounded-3xl p-8 text-center text-slate-500">
+                        No reviews have been published yet. Be the first to share your thoughts!
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="mt-20 border-t border-slate-900 py-8 bg-slate-950 text-slate-500 text-center text-sm">
+        <div class="max-w-7xl mx-auto px-6">
+            <p>&copy; 2026 Athena LMS - Built for SE1020 Object Oriented Programming. All rights reserved.</p>
+        </div>
+    </footer>
+
+</body>
+</html>

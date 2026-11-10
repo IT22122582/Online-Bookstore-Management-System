@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Authors - Athena LMS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        outfit: ['Outfit', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen font-sans">
+    
+    <!-- Top Navigation Bar -->
+    <nav class="sticky top-0 z-50 glass-panel border-b border-slate-800 px-6 py-4">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <div class="bg-gradient-to-tr from-indigo-500 to-violet-500 p-2.5 rounded-xl shadow-lg shadow-indigo-500/20">
+                    <i class="fa-solid fa-book-open text-white text-xl"></i>
+                </div>
+                <a href="/" class="text-2xl font-bold font-outfit bg-gradient-to-r from-indigo-400 via-violet-400 to-pink-400 bg-clip-text text-transparent">Athena LMS</a>
+            </div>
+            <div class="hidden md:flex space-x-1">
+                <a href="/" class="px-4 py-2 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white font-medium transition duration-200"><i class="fa-solid fa-chart-line mr-2"></i>Dashboard</a>
+                <a href="/users" class="px-4 py-2 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white font-medium transition duration-200"><i class="fa-solid fa-users mr-2"></i>Users</a>
+                <a href="/books" class="px-4 py-2 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white font-medium transition duration-200"><i class="fa-solid fa-book-bookmark mr-2"></i>Books</a>
+                <a href="/authors" class="px-4 py-2 rounded-lg bg-indigo-600 text-white font-medium transition duration-200"><i class="fa-solid fa-feather mr-2"></i>Authors</a>
+                <a href="/borrow" class="px-4 py-2 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white font-medium transition duration-200"><i class="fa-solid fa-handshake mr-2"></i>Loans</a>
+                <a href="/reviews" class="px-4 py-2 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white font-medium transition duration-200"><i class="fa-solid fa-star-half-stroke mr-2"></i>Reviews</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main class="max-w-7xl mx-auto px-6 py-10 space-y-8">
+        
+        <!-- Section Header -->
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div>
+                <h1 class="text-3xl font-extrabold font-outfit text-white">Authors Directory</h1>
+                <p class="text-slate-400 text-sm">Register new writers, search author backgrounds, update detailed summaries, or delete logs.</p>
+            </div>
+            <button onclick="openCreateModal()" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-indigo-500 to-violet-600 text-white font-semibold hover:from-indigo-600 hover:to-violet-700 shadow-lg shadow-indigo-500/20 transition duration-200">
+                <i class="fa-solid fa-plus mr-2"></i>Register Author
+            </button>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="glass-panel rounded-2xl p-4">
+            <form action="/authors" method="get" class="flex flex-col sm:flex-row gap-3">
+                <div class="relative flex-grow">
+                    <i class="fa-solid fa-magnifying-glass absolute left-4 top-3.5 text-slate-500"></i>
+                    <input type="text" name="search" th:value="${search}" placeholder="Search authors by ID, name, or biography..." 
+                           class="w-full bg-slate-900 border border-slate-800 rounded-xl py-3 pl-12 pr-4 text-slate-200 focus:outline-none focus:border-indigo-500 transition duration-200">
+                </div>
+                <button type="submit" class="px-6 py-3 rounded-xl bg-slate-800 text-slate-200 hover:bg-slate-700 font-semibold border border-slate-700 transition duration-200">
+                    Search
+                </button>
+                <a href="/authors" class="px-4 py-3 rounded-xl bg-slate-900/50 hover:bg-slate-850 text-slate-400 text-center font-medium border border-slate-800/80 transition duration-200">
+                    Reset
+                </a>
+            </form>
+        </div>
+
+        <!-- Authors Directory Table -->
+        <div class="glass-panel rounded-3xl overflow-hidden shadow-2xl">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left whitespace-nowrap">
+                    <thead>
+                        <tr class="border-b border-slate-850 bg-slate-900/40 text-slate-400 text-xs font-semibold uppercase tracking-wider">
+                            <th class="px-6 py-4">ID</th>
+                            <th class="px-6 py-4">Name</th>
+                            <th class="px-6 py-4">Biography</th>
+                            <th class="px-6 py-4">Affiliation Format</th>
+                            <th class="px-6 py-4">Type Specific Info</th>
+                            <th class="px-6 py-4 text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-850 text-sm">
+                        <tr th:each="author : ${authors}" class="hover:bg-slate-900/20 transition duration-150">
+                            <td class="px-6 py-4 font-mono text-slate-300 text-xs" th:text="${author.id}">A001</td>
+                            <td class="px-6 py-4 font-semibold text-slate-300" th:text="${author.name}">Name</td>
+                            <td class="px-6 py-4 text-slate-300 max-w-sm" th:text="${author.bio}">Biography</td>
+                            <td class="px-6 py-4 text-slate-300" th:text="${author.class.simpleName == 'GuestAuthor' ? 'Guest' : 'Permanent'}">
+                                Guest
+                            </td>
+                            <td class="px-6 py-4 text-slate-300">
+                                <span th:if="${author.class.simpleName == 'GuestAuthor'}" th:text="'From: ' + ${author.institution}">institution</span>
+                                <span th:if="${author.class.simpleName == 'PermanentAuthor'}" th:text="'Office: ' + ${author.officeNumber}">office</span>
+                            </td>
+                            <td class="px-6 py-4 text-right space-x-2">
+                                <button th:data-id="${author.id}" 
+                                        th:data-name="${author.name}"
+                                        th:data-bio="${author.bio}"
+                                        th:data-type="${author.class.simpleName == 'GuestAuthor' ? 'GUEST' : 'PERMANENT'}"
+                                        th:data-institution="${author.class.simpleName == 'GuestAuthor' ? author.institution : ''}"
+                                        th:data-duration="${author.class.simpleName == 'GuestAuthor' ? author.visitDurationDays : ''}"
+                                        th:data-contract="${author.class.simpleName == 'PermanentAuthor' ? author.contractPeriodYears : ''}"
+                                        th:data-office="${author.class.simpleName == 'PermanentAuthor' ? author.officeNumber : ''}"
+                                        onclick="openEditModal(this)" 
+                                        class="p-2 text-indigo-400 hover:text-indigo-300 bg-indigo-500/5 hover:bg-indigo-500/10 rounded-lg transition duration-200">
+                                    <i class="fa-solid fa-pencil" aria-hidden="true"></i>
+                                    <span class="sr-only">Edit author</span>
+                                </button>
+                                <a th:href="@{'/authors/delete/' + ${author.id}}" 
+                                   onclick="return confirm('Are you sure you want to delete this author?')"
+                                   class="inline-block p-2 text-rose-400 hover:text-rose-300 bg-rose-500/5 hover:bg-rose-500/10 rounded-lg transition duration-200">
+                                    <i class="fa-solid fa-trash" aria-hidden="true"></i>
+                                    <span class="sr-only">Delete author</span>
+                                </a>
+                            </td>
+                        </tr>
+                        <tr th:if="${authors.empty}">
+                            <td colspan="6" class="px-6 py-8 text-center text-slate-500">No authors found in directory.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- Create Modal -->
+    <div id="createModal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-sm hidden">
+        <div class="glass-panel w-full max-w-lg rounded-3xl p-8 border border-slate-800 shadow-2xl relative">
+            <button onclick="closeCreateModal()" class="absolute top-6 right-6 text-slate-500 hover:text-slate-200"><i class="fa-solid fa-xmark text-xl"></i></button>
+            <h2 class="text-2xl font-bold font-outfit text-white mb-6"><i class="fa-solid fa-plus mr-2 text-indigo-500"></i>Register Author</h2>
+            
+            <form action="/authors/add" method="post" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Author Name</label>
+                    <input type="text" name="name" required class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-slate-200 focus:outline-none focus:border-indigo-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Biography</label>
+                    <textarea name="bio" required class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-slate-200 focus:outline-none focus:border-indigo-500 h-24 resize-none"></textarea>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Affiliation Format</label>
+                    <select name="authorType" id="createAuthorType" onchange="toggleCreateAuthorFields()" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-slate-200 focus:outline-none focus:border-indigo-500">
+                        <option value="PERMANENT">Permanent Resident Author</option>
+                        <option value="GUEST">Guest Visiting Author</option>
+                    </select>
+                </div>
+                
+                <!-- Permanent Author Fields -->
+                <div id="createPermanentFields" class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Contract (years)</label>
+                        <input type="number" name="contractPeriodYears" placeholder="e.g. 5" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-slate-200 focus:outline-none focus:border-indigo-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Office Room</label>
+                        <input type="text" name="officeNumber" placeholder="e.g. Room 204" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-slate-200 focus:outline-none focus:border-indigo-500">
+                    </div>
+                </div>
+
+                <!-- Guest Author Fields -->
+                <div id="createGuestFields" class="grid grid-cols-2 gap-4 hidden">
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Home Institution</label>
+                        <input type="text" name="institution" placeholder="e.g. Oxford Uni" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-slate-200 focus:outline-none focus:border-indigo-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Visiting Days</label>
+                        <input type="number" name="visitDurationDays" placeholder="e.g. 90" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-slate-200 focus:outline-none focus:border-indigo-500">
+                    </div>
+                </div>
+
+                <div class="flex justify-end space-x-3 pt-4">
+                    <button type="button" onclick="closeCreateModal()" class="px-5 py-2.5 rounded-xl bg-slate-950 border border-slate-850 text-slate-450 hover:text-slate-250 font-semibold transition">Cancel</button>
+                    <button type="submit" class="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold transition shadow-lg shadow-indigo-500/20">Submit</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit Modal -->
+    <div id="editModal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-sm hidden">
+        <div class="glass-panel w-full max-w-lg rounded-3xl p-8 border border-slate-800 shadow-2xl relative">
+            <button onclick="closeEditModal()" class="absolute top-6 right-6 text-slate-500 hover:text-slate-200"><i class="fa-solid fa-xmark text-xl"></i></button>
+            <h2 class="text-2xl font-bold font-outfit text-white mb-6"><i class="fa-solid fa-pencil mr-2 text-indigo-500"></i>Edit Author Details</h2>
+            
+            <form action="/authors/edit" method="post" class="space-y-4">
+                <input type="hidden" name="id" id="editId">
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Author Name</label>
+                    <input type="text" name="name" id="editName" required class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-slate-200 focus:outline-none focus:border-indigo-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Biography</label>
+                    <textarea name="bio" id="editBio" required class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-slate-200 focus:outline-none focus:border-indigo-500 h-24 resize-none"></textarea>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Affiliation Format</label>
+                    <select name="authorType" id="editAuthorType" onchange="toggleEditAuthorFields()" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-slate-200 focus:outline-none focus:border-indigo-500">
+                        <option value="PERMANENT">Permanent Resident Author</option>
+                        <option value="GUEST">Guest Visiting Author</option>
+                    </select>
+                </div>
+                
+                <!-- Permanent Author Fields -->
+                <div id="editPermanentFields" class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Contract (years)</label>
+                        <input type="number" name="contractPeriodYears" id="editContract" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-slate-200 focus:outline-none focus:border-indigo-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Office Room</label>
+                        <input type="text" name="officeNumber" id="editOffice" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-slate-200 focus:outline-none focus:border-indigo-500">
+                    </div>
+                </div>
+
+                <!-- Guest Author Fields -->
+                <div id="editGuestFields" class="grid grid-cols-2 gap-4 hidden">
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Home Institution</label>
+                        <input type="text" name="institution" id="editInstitution" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-slate-200 focus:outline-none focus:border-indigo-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Visiting Days</label>
+                        <input type="number" name="visitDurationDays" id="editDuration" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-slate-200 focus:outline-none focus:border-indigo-500">
+                    </div>
+                </div>
+
+                <div class="flex justify-end space-x-3 pt-4">
+                    <button type="button" onclick="closeEditModal()" class="px-5 py-2.5 rounded-xl bg-slate-950 border border-slate-850 text-slate-450 hover:text-slate-250 font-semibold transition">Cancel</button>
+                    <button type="submit" class="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold transition shadow-lg shadow-indigo-500/20">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Scripts to open/close modals and toggle dynamic forms -->
+    <script>
+        function toggleCreateAuthorFields() {
+            const format = document.getElementById("createAuthorType").value;
+            const permanentFields = document.getElementById("createPermanentFields");
+            const guestFields = document.getElementById("createGuestFields");
+            if (format === "GUEST") {
+                permanentFields.classList.add("hidden");
+                guestFields.classList.remove("hidden");
+            } else {
+                permanentFields.classList.remove("hidden");
+                guestFields.classList.add("hidden");
+            }
+        }
+
+        function toggleEditAuthorFields() {
+            const format = document.getElementById("editAuthorType").value;
+            const permanentFields = document.getElementById("editPermanentFields");
+            const guestFields = document.getElementById("editGuestFields");
+            if (format === "GUEST") {
+                permanentFields.classList.add("hidden");
+                guestFields.classList.remove("hidden");
+            } else {
+                permanentFields.classList.remove("hidden");
+                guestFields.classList.add("hidden");
+            }
+        }
+
+        function openCreateModal() {
+            document.getElementById("createModal").classList.remove("hidden");
+        }
+
+        function closeCreateModal() {
+            document.getElementById("createModal").classList.add("hidden");
+        }
+
+        function openEditModal(button) {
+            const id = button.getAttribute("data-id");
+            const name = button.getAttribute("data-name");
+            const bio = button.getAttribute("data-bio");
+            const format = button.getAttribute("data-type");
+            const institution = button.getAttribute("data-institution");
+            const duration = button.getAttribute("data-duration");
+            const contract = button.getAttribute("data-contract");
+            const office = button.getAttribute("data-office");
+
+            document.getElementById("editId").value = id;
+            document.getElementById("editName").value = name;
+            document.getElementById("editBio").value = bio;
+            document.getElementById("editAuthorType").value = format;
+
+            if (format === "GUEST") {
+                document.getElementById("editInstitution").value = institution;
+                document.getElementById("editDuration").value = duration;
+            } else {
+                document.getElementById("editContract").value = contract;
+                document.getElementById("editOffice").value = office;
+            }
+
+            toggleEditAuthorFields();
+            document.getElementById("editModal").classList.remove("hidden");
+        }
+
+        function closeEditModal() {
+            document.getElementById("editModal").classList.add("hidden");
+        }
+    </script>
+</body>
+</html>

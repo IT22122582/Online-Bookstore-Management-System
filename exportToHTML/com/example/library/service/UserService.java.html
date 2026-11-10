@@ -1,0 +1,67 @@
+<html>
+<head>
+<title>UserService.java</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #cf8e6d;}
+.s1 { color: #bcbec4;}
+.s2 { color: #bcbec4;}
+.s3 { color: #6aab73;}
+.s4 { color: #2aacb8;}
+</style>
+</head>
+<body bgcolor="#191a1c">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+UserService.java</font>
+</center></td></tr></table>
+<pre><span class="s0">package </span><span class="s1">com</span><span class="s2">.</span><span class="s1">example</span><span class="s2">.</span><span class="s1">library</span><span class="s2">.</span><span class="s1">service</span><span class="s2">;</span>
+
+<span class="s0">import </span><span class="s1">com</span><span class="s2">.</span><span class="s1">example</span><span class="s2">.</span><span class="s1">library</span><span class="s2">.</span><span class="s1">model</span><span class="s2">.</span><span class="s1">User</span><span class="s2">;</span>
+<span class="s0">import </span><span class="s1">com</span><span class="s2">.</span><span class="s1">example</span><span class="s2">.</span><span class="s1">library</span><span class="s2">.</span><span class="s1">repository</span><span class="s2">.</span><span class="s1">UserRepository</span><span class="s2">;</span>
+<span class="s0">import </span><span class="s1">org</span><span class="s2">.</span><span class="s1">springframework</span><span class="s2">.</span><span class="s1">beans</span><span class="s2">.</span><span class="s1">factory</span><span class="s2">.</span><span class="s1">annotation</span><span class="s2">.</span><span class="s1">Autowired</span><span class="s2">;</span>
+<span class="s0">import </span><span class="s1">org</span><span class="s2">.</span><span class="s1">springframework</span><span class="s2">.</span><span class="s1">stereotype</span><span class="s2">.</span><span class="s1">Service</span><span class="s2">;</span>
+<span class="s0">import </span><span class="s1">java</span><span class="s2">.</span><span class="s1">util</span><span class="s2">.</span><span class="s1">List</span><span class="s2">;</span>
+<span class="s0">import </span><span class="s1">java</span><span class="s2">.</span><span class="s1">util</span><span class="s2">.</span><span class="s1">Optional</span><span class="s2">;</span>
+<span class="s0">import </span><span class="s1">java</span><span class="s2">.</span><span class="s1">util</span><span class="s2">.</span><span class="s1">stream</span><span class="s2">.</span><span class="s1">Collectors</span><span class="s2">;</span>
+
+<span class="s1">@Service</span>
+<span class="s0">public class </span><span class="s1">UserService </span><span class="s2">{</span>
+    <span class="s1">@Autowired</span>
+    <span class="s0">private </span><span class="s1">UserRepository userRepository</span><span class="s2">;</span>
+
+    <span class="s0">public </span><span class="s1">List</span><span class="s2">&lt;</span><span class="s1">User</span><span class="s2">&gt; </span><span class="s1">getAllUsers</span><span class="s2">() {</span>
+        <span class="s0">return </span><span class="s1">userRepository</span><span class="s2">.</span><span class="s1">findAll</span><span class="s2">();</span>
+    <span class="s2">}</span>
+
+    <span class="s0">public </span><span class="s1">Optional</span><span class="s2">&lt;</span><span class="s1">User</span><span class="s2">&gt; </span><span class="s1">getUserById</span><span class="s2">(</span><span class="s1">String id</span><span class="s2">) {</span>
+        <span class="s0">return </span><span class="s1">userRepository</span><span class="s2">.</span><span class="s1">findById</span><span class="s2">(</span><span class="s1">id</span><span class="s2">);</span>
+    <span class="s2">}</span>
+
+    <span class="s0">public </span><span class="s1">List</span><span class="s2">&lt;</span><span class="s1">User</span><span class="s2">&gt; </span><span class="s1">searchUsers</span><span class="s2">(</span><span class="s1">String query</span><span class="s2">) {</span>
+        <span class="s0">if </span><span class="s2">(</span><span class="s1">query </span><span class="s2">== </span><span class="s0">null </span><span class="s2">|| </span><span class="s1">query</span><span class="s2">.</span><span class="s1">trim</span><span class="s2">().</span><span class="s1">isEmpty</span><span class="s2">()) {</span>
+            <span class="s0">return </span><span class="s1">getAllUsers</span><span class="s2">();</span>
+        <span class="s2">}</span>
+        <span class="s1">String lowerQuery </span><span class="s2">= </span><span class="s1">query</span><span class="s2">.</span><span class="s1">toLowerCase</span><span class="s2">();</span>
+        <span class="s0">return </span><span class="s1">userRepository</span><span class="s2">.</span><span class="s1">findAll</span><span class="s2">().</span><span class="s1">stream</span><span class="s2">()</span>
+                <span class="s2">.</span><span class="s1">filter</span><span class="s2">(</span><span class="s1">u -&gt; u</span><span class="s2">.</span><span class="s1">getUsername</span><span class="s2">().</span><span class="s1">toLowerCase</span><span class="s2">().</span><span class="s1">contains</span><span class="s2">(</span><span class="s1">lowerQuery</span><span class="s2">) </span>
+                          <span class="s2">|| </span><span class="s1">u</span><span class="s2">.</span><span class="s1">getEmail</span><span class="s2">().</span><span class="s1">toLowerCase</span><span class="s2">().</span><span class="s1">contains</span><span class="s2">(</span><span class="s1">lowerQuery</span><span class="s2">) </span>
+                          <span class="s2">|| </span><span class="s1">u</span><span class="s2">.</span><span class="s1">getId</span><span class="s2">().</span><span class="s1">toLowerCase</span><span class="s2">().</span><span class="s1">contains</span><span class="s2">(</span><span class="s1">lowerQuery</span><span class="s2">))</span>
+                <span class="s2">.</span><span class="s1">collect</span><span class="s2">(</span><span class="s1">Collectors</span><span class="s2">.</span><span class="s1">toList</span><span class="s2">());</span>
+    <span class="s2">}</span>
+
+    <span class="s0">public </span><span class="s1">User saveUser</span><span class="s2">(</span><span class="s1">User user</span><span class="s2">) {</span>
+        <span class="s0">if </span><span class="s2">(</span><span class="s1">user</span><span class="s2">.</span><span class="s1">getId</span><span class="s2">() == </span><span class="s0">null </span><span class="s2">|| </span><span class="s1">user</span><span class="s2">.</span><span class="s1">getId</span><span class="s2">().</span><span class="s1">trim</span><span class="s2">().</span><span class="s1">isEmpty</span><span class="s2">()) {</span>
+            <span class="s1">user</span><span class="s2">.</span><span class="s1">setId</span><span class="s2">(</span><span class="s3">&quot;U&quot; </span><span class="s2">+ </span><span class="s1">System</span><span class="s2">.</span><span class="s1">currentTimeMillis</span><span class="s2">() % </span><span class="s4">1000000</span><span class="s2">);</span>
+        <span class="s2">}</span>
+        <span class="s0">return </span><span class="s1">userRepository</span><span class="s2">.</span><span class="s1">save</span><span class="s2">(</span><span class="s1">user</span><span class="s2">);</span>
+    <span class="s2">}</span>
+
+    <span class="s0">public boolean </span><span class="s1">deleteUser</span><span class="s2">(</span><span class="s1">String id</span><span class="s2">) {</span>
+        <span class="s0">return </span><span class="s1">userRepository</span><span class="s2">.</span><span class="s1">deleteById</span><span class="s2">(</span><span class="s1">id</span><span class="s2">);</span>
+    <span class="s2">}</span>
+<span class="s2">}</span>
+</pre>
+</body>
+</html>

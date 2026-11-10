@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Catalogue - Athena LMS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        outfit: ['Outfit', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen font-sans">
+    
+    <!-- Top Navigation Bar -->
+    <nav class="sticky top-0 z-50 glass-panel border-b border-slate-800 px-6 py-4">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <div class="bg-gradient-to-tr from-indigo-500 to-violet-500 p-2.5 rounded-xl shadow-lg shadow-indigo-500/20">
+                    <i class="fa-solid fa-book-open text-white text-xl"></i>
+                </div>
+                <a href="/" class="text-2xl font-bold font-outfit bg-gradient-to-r from-indigo-400 via-violet-400 to-pink-400 bg-clip-text text-transparent">Athena LMS</a>
+            </div>
+            <div class="hidden md:flex space-x-1">
+                <a href="/" class="px-4 py-2 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white font-medium transition duration-200"><i class="fa-solid fa-chart-line mr-2"></i>Dashboard</a>
+                <a href="/users" class="px-4 py-2 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white font-medium transition duration-200"><i class="fa-solid fa-users mr-2"></i>Users</a>
+                <a href="/books" class="px-4 py-2 rounded-lg bg-indigo-600 text-white font-medium transition duration-200"><i class="fa-solid fa-book-bookmark mr-2"></i>Books</a>
+                <a href="/authors" class="px-4 py-2 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white font-medium transition duration-200"><i class="fa-solid fa-feather mr-2"></i>Authors</a>
+                <a href="/borrow" class="px-4 py-2 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white font-medium transition duration-200"><i class="fa-solid fa-handshake mr-2"></i>Loans</a>
+                <a href="/reviews" class="px-4 py-2 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white font-medium transition duration-200"><i class="fa-solid fa-star-half-stroke mr-2"></i>Reviews</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main class="max-w-7xl mx-auto px-6 py-10 space-y-8">
+        
+        <!-- Section Header -->
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div>
+                <h1 class="text-3xl font-extrabold font-outfit text-white">Book Catalogue</h1>
+                <p class="text-slate-400 text-sm">Add electronic E-Books or physical Printed Books, configure attributes, or filter catalog items.</p>
+            </div>
+            <button onclick="openCreateModal()" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-indigo-500 to-violet-600 text-white font-semibold hover:from-indigo-600 hover:to-violet-700 shadow-lg shadow-indigo-500/20 transition duration-200">
+                <i class="fa-solid fa-plus mr-2"></i>Catalogue Book
+            </button>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="glass-panel rounded-2xl p-4">
+            <form action="/books" method="get" class="flex flex-col sm:flex-row gap-3">
+                <div class="relative flex-grow">
+                    <i class="fa-solid fa-magnifying-glass absolute left-4 top-3.5 text-slate-500"></i>
+                    <input type="text" name="search" th:value="${search}" placeholder="Search books by ID, title, ISBN, or genre..." 
+                           class="w-full bg-slate-900 border border-slate-800 rounded-xl py-3 pl-12 pr-4 text-slate-200 focus:outline-none focus:border-indigo-500 transition duration-200">
+                </div>
+                <button type="submit" class="px-6 py-3 rounded-xl bg-slate-800 text-slate-200 hover:bg-slate-700 font-semibold border border-slate-700 transition duration-200">
+                    Search
+                </button>
+                <a href="/books" class="px-4 py-3 rounded-xl bg-slate-900/50 hover:bg-slate-850 text-slate-400 text-center font-medium border border-slate-800/80 transition duration-200">
+                    Reset
+                </a>
+            </form>
+        </div>
+
+        <!-- Books Table Panel -->
+        <div class="glass-panel rounded-3xl overflow-hidden shadow-2xl">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left whitespace-nowrap">
+                    <thead>
+                        <tr class="border-b border-slate-850 bg-slate-900/40 text-slate-400 text-xs font-semibold uppercase tracking-wider">
+                            <th class="px-6 py-4">ID</th>
+                            <th class="px-6 py-4">Title</th>
+                            <th class="px-6 py-4">Author ID</th>
+                            <th class="px-6 py-4">ISBN</th>
+                            <th class="px-6 py-4">Genre</th>
+                            <th class="px-6 py-4">Format</th>
+                            <th class="px-6 py-4">Availability</th>
+                            <th class="px-6 py-4 text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-850 text-sm">
+                        <tr th:each="book : ${books}" class="hover:bg-slate-900/20 transition duration-150">
+                            <td class="px-6 py-4 font-mono text-slate-300" th:text="${book.id}">B001</td>
+                            <td class="px-6 py-4 font-semibold text-slate-300" th:text="${book.title}">Title</td>
+                            <td class="px-6 py-4 text-slate-300 font-mono text-xs" th:text="${book.authorId}">A001</td>
+                            <td class="px-6 py-4 text-slate-300" th:text="${book.isbn}">isbn</td>
+                            <td class="px-6 py-4 text-slate-300" th:text="${book.genre}">genre</td>
+                            <td class="px-6 py-4 text-slate-300" th:text="${book.class.simpleName == 'EBook' ? 'E-Book' : 'Printed'}">
+                                Printed
+                            </td>
+                            <td class="px-6 py-4 text-slate-300" th:text="${book.available ? 'Available' : 'Borrowed'}">
+                                Available
+                            </td>
+                            <td class="px-6 py-4 text-right space-x-2">
+                                <button th:data-id="${book.id}" 
+                                        th:data-title="${book.title}"
+                                        th:data-authorid="${book.authorId}"
+                                        th:data-isbn="${book.isbn}"
+                                        th:data-genre="${book.genre}"
+                                        th:data-type="${book.class.simpleName == 'EBook' ? 'EBOOK' : 'PRINTED'}"
+                                        th:data-available="${book.available}"
+                                        th:data-filesize="${book.class.simpleName == 'EBook' ? book.fileSizeMB : ''}"
+                                        th:data-downloadurl="${book.class.simpleName == 'EBook' ? book.downloadUrl : ''}"
+                                        th:data-shelf="${book.class.simpleName == 'PrintedBook' ? book.shelfLocation : ''}"
+                                        th:data-weight="${book.class.simpleName == 'PrintedBook' ? book.weightKg : ''}"
+                                        onclick="openEditModal(this)" 
+                                        class="p-2 text-indigo-400 hover:text-indigo-300 bg-indigo-500/5 hover:bg-indigo-500/10 rounded-lg transition duration-200">
+                                    <i class="fa-solid fa-pencil" aria-hidden="true"></i>
+                                    <span class="sr-only">Edit book</span>
+                                </button>
+                                <a th:href="@{'/books/delete/' + ${book.id}}" 
+                                   onclick="return confirm('Are you sure you want to delete this book?')"
+                                   class="inline-block p-2 text-rose-400 hover:text-rose-300 bg-rose-500/5 hover:bg-rose-500/10 rounded-lg transition duration-200">
+                                    <i class="fa-solid fa-trash" aria-hidden="true"></i>
+                                    <span class="sr-only">Delete book</span>
+                                </a>
+                            </td>
+                        </tr>
+                        <tr th:if="${books.empty}">
+                            <td colspan="8" class="px-6 py-8 text-center text-slate-500">No books found in catalogue.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- Create Modal -->
+    <div id="createModal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-sm hidden">
+        <div class="glass-panel w-full max-w-lg rounded-3xl p-8 border border-slate-800 shadow-2xl relative">
+            <button onclick="closeCreateModal()" class="absolute top-6 right-6 text-slate-500 hover:text-slate-200"><i class="fa-solid fa-xmark text-xl"></i></button>
+            <h2 class="text-2xl font-bold font-outfit text-white mb-6"><i class="fa-solid fa-circle-plus mr-2 text-indigo-500"></i>Catalogue Book</h2>
+            
+            <form action="/books/add" method="post" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Book Title</label>
+                    <input type="text" name="title" required class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-slate-200 focus:outline-none focus:border-indigo-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Author</label>
+                    <select name="authorId" required class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-slate-200 focus:outline-none focus:border-indigo-500">
+                        <option value="">-- Select Author --</option>
+                        <option th:each="author : ${authors}" th:value="${author.id}" th:text="${author.name} + ' (' + ${author.id} + ')'">Author</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">ISBN</label>
+                    <input type="text" name="isbn" required class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-slate-200 focus:outline-none focus:border-indigo-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Genre</label>
+                    <input type="text" name="genre" required class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-slate-200 focus:outline-none focus:border-indigo-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Book Format</label>
+                    <select name="bookType" id="createBookType" onchange="toggleCreateBookFields()" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-slate-200 focus:outline-none focus:border-indigo-500">
+                        <option value="PRINTED">Physical Printed Book</option>
+                        <option value="EBOOK">Digital E-Book</option>
+                    </select>
+                </div>
+                
+                <!-- Printed Book Fields -->
+                <div id="createPrintedFields" class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Shelf Location</label>
+                        <input type="text" name="shelfLocation" placeholder="e.g. Shelf B-4" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-slate-200 focus:outline-none focus:border-indigo-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Weight (kg)</label>
+                        <input type="number" step="0.01" name="weightKg" placeholder="e.g. 0.35" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-slate-200 focus:outline-none focus:border-indigo-500">
+                    </div>
+                </div>
+
+                <!-- E-Book Fields -->
+                <div id="createEBookFields" class="grid grid-cols-2 gap-4 hidden">
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">File Size (MB)</label>
+                        <input type="number" step="0.1" name="fileSizeMB" placeholder="e.g. 4.5" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-slate-200 focus:outline-none focus:border-indigo-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Download URL</label>
+                        <input type="text" name="downloadUrl" placeholder="e.g. http://..." class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-slate-200 focus:outline-none focus:border-indigo-500">
+                    </div>
+                </div>
+
+                <div class="flex justify-end space-x-3 pt-4">
+                    <button type="button" onclick="closeCreateModal()" class="px-5 py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-400 hover:text-slate-200 font-semibold transition">Cancel</button>
+                    <button type="submit" class="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold transition shadow-lg shadow-indigo-500/20">Submit</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit Modal -->
+    <div id="editModal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-sm hidden">
+        <div class="glass-panel w-full max-w-lg rounded-3xl p-8 border border-slate-800 shadow-2xl relative">
+            <button onclick="closeEditModal()" class="absolute top-6 right-6 text-slate-500 hover:text-slate-200"><i class="fa-solid fa-xmark text-xl"></i></button>
+            <h2 class="text-2xl font-bold font-outfit text-white mb-6"><i class="fa-solid fa-pencil mr-2 text-indigo-500"></i>Edit Book Details</h2>
+            
+            <form action="/books/edit" method="post" class="space-y-4">
+                <input type="hidden" name="id" id="editId">
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Book Title</label>
+                    <input type="text" name="title" id="editTitle" required class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-slate-200 focus:outline-none focus:border-indigo-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Author</label>
+                    <select name="authorId" id="editAuthorId" required class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-slate-200 focus:outline-none focus:border-indigo-500">
+                        <option th:each="author : ${authors}" th:value="${author.id}" th:text="${author.name} + ' (' + ${author.id} + ')'">Author</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">ISBN</label>
+                    <input type="text" name="isbn" id="editIsbn" required class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-slate-200 focus:outline-none focus:border-indigo-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Genre</label>
+                    <input type="text" name="genre" id="editGenre" required class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-slate-200 focus:outline-none focus:border-indigo-500">
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Availability</label>
+                        <select name="available" id="editAvailable" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-slate-200 focus:outline-none focus:border-indigo-500">
+                            <option value="true">Available</option>
+                            <option value="false">Borrowed</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Book Format</label>
+                        <select name="bookType" id="editBookType" onchange="toggleEditBookFields()" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-slate-200 focus:outline-none focus:border-indigo-500">
+                            <option value="PRINTED">Physical Printed Book</option>
+                            <option value="EBOOK">Digital E-Book</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- Printed Book Fields -->
+                <div id="editPrintedFields" class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Shelf Location</label>
+                        <input type="text" name="shelfLocation" id="editShelf" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-slate-200 focus:outline-none focus:border-indigo-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Weight (kg)</label>
+                        <input type="number" step="0.01" name="weightKg" id="editWeight" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-slate-200 focus:outline-none focus:border-indigo-500">
+                    </div>
+                </div>
+
+                <!-- E-Book Fields -->
+                <div id="editEBookFields" class="grid grid-cols-2 gap-4 hidden">
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">File Size (MB)</label>
+                        <input type="number" step="0.1" name="fileSizeMB" id="editFileSize" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-slate-200 focus:outline-none focus:border-indigo-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Download URL</label>
+                        <input type="text" name="downloadUrl" id="editDownloadUrl" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-slate-200 focus:outline-none focus:border-indigo-500">
+                    </div>
+                </div>
+
+                <div class="flex justify-end space-x-3 pt-4">
+                    <button type="button" onclick="closeEditModal()" class="px-5 py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-400 hover:text-slate-200 font-semibold transition">Cancel</button>
+                    <button type="submit" class="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold transition shadow-lg shadow-indigo-500/20">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Scripts to open/close modals and toggle dynamic forms -->
+    <script>
+        function toggleCreateBookFields() {
+            const format = document.getElementById("createBookType").value;
+            const printFields = document.getElementById("createPrintedFields");
+            const ebookFields = document.getElementById("createEBookFields");
+            if (format === "EBOOK") {
+                printFields.classList.add("hidden");
+                ebookFields.classList.remove("hidden");
+            } else {
+                printFields.classList.remove("hidden");
+                ebookFields.classList.add("hidden");
+            }
+        }
+
+        function toggleEditBookFields() {
+            const format = document.getElementById("editBookType").value;
+            const printFields = document.getElementById("editPrintedFields");
+            const ebookFields = document.getElementById("editEBookFields");
+            if (format === "EBOOK") {
+                printFields.classList.add("hidden");
+                ebookFields.classList.remove("hidden");
+            } else {
+                printFields.classList.remove("hidden");
+                ebookFields.classList.add("hidden");
+            }
+        }
+
+        function openCreateModal() {
+            document.getElementById("createModal").classList.remove("hidden");
+        }
+
+        function closeCreateModal() {
+            document.getElementById("createModal").classList.add("hidden");
+        }
+
+        function openEditModal(button) {
+            const id = button.getAttribute("data-id");
+            const title = button.getAttribute("data-title");
+            const authorId = button.getAttribute("data-authorid");
+            const isbn = button.getAttribute("data-isbn");
+            const genre = button.getAttribute("data-genre");
+            const format = button.getAttribute("data-type");
+            const available = button.getAttribute("data-available");
+            const fileSize = button.getAttribute("data-filesize");
+            const downloadUrl = button.getAttribute("data-downloadurl");
+            const shelf = button.getAttribute("data-shelf");
+            const weight = button.getAttribute("data-weight");
+
+            document.getElementById("editId").value = id;
+            document.getElementById("editTitle").value = title;
+            document.getElementById("editAuthorId").value = authorId;
+            document.getElementById("editIsbn").value = isbn;
+            document.getElementById("editGenre").value = genre;
+            document.getElementById("editAvailable").value = available;
+            document.getElementById("editBookType").value = format;
+
+            if (format === "EBOOK") {
+                document.getElementById("editFileSize").value = fileSize;
+                document.getElementById("editDownloadUrl").value = downloadUrl;
+            } else {
+                document.getElementById("editShelf").value = shelf;
+                document.getElementById("editWeight").value = weight;
+            }
+
+            toggleEditBookFields();
+            document.getElementById("editModal").classList.remove("hidden");
+        }
+
+        function closeEditModal() {
+            document.getElementById("editModal").classList.add("hidden");
+        }
+    </script>
+</body>
+</html>

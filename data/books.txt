@@ -1,0 +1,4 @@
+B001|Harry Potter and the Sorcerer's Stone|A001|9780590353427|Fantasy|true|PRINTED|Shelf A-3|0.45
+B002|A Game of Thrones|A002|9780553103540|Fantasy|true|EBOOK|12.4|http://library-downloads/got.epub
+B003|Harry Potter and the Chamber of Secrets|A001|9780439064873|Fantasy|false|PRINTED|Shelf A-4|0.48
+B893278|The Hobbit|A339491|9780007525492|Fantasy|true|PRINTED|Shelf H-1|0.5

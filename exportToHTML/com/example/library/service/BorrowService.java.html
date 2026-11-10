@@ -1,0 +1,122 @@
+<html>
+<head>
+<title>BorrowService.java</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #cf8e6d;}
+.s1 { color: #bcbec4;}
+.s2 { color: #bcbec4;}
+.s3 { color: #7a7e85;}
+.s4 { color: #6aab73;}
+.s5 { color: #2aacb8;}
+</style>
+</head>
+<body bgcolor="#191a1c">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+BorrowService.java</font>
+</center></td></tr></table>
+<pre><span class="s0">package </span><span class="s1">com</span><span class="s2">.</span><span class="s1">example</span><span class="s2">.</span><span class="s1">library</span><span class="s2">.</span><span class="s1">service</span><span class="s2">;</span>
+
+<span class="s0">import </span><span class="s1">com</span><span class="s2">.</span><span class="s1">example</span><span class="s2">.</span><span class="s1">library</span><span class="s2">.</span><span class="s1">model</span><span class="s2">.*;</span>
+<span class="s0">import </span><span class="s1">com</span><span class="s2">.</span><span class="s1">example</span><span class="s2">.</span><span class="s1">library</span><span class="s2">.</span><span class="s1">repository</span><span class="s2">.</span><span class="s1">BookRepository</span><span class="s2">;</span>
+<span class="s0">import </span><span class="s1">com</span><span class="s2">.</span><span class="s1">example</span><span class="s2">.</span><span class="s1">library</span><span class="s2">.</span><span class="s1">repository</span><span class="s2">.</span><span class="s1">BorrowTransactionRepository</span><span class="s2">;</span>
+<span class="s0">import </span><span class="s1">com</span><span class="s2">.</span><span class="s1">example</span><span class="s2">.</span><span class="s1">library</span><span class="s2">.</span><span class="s1">repository</span><span class="s2">.</span><span class="s1">UserRepository</span><span class="s2">;</span>
+<span class="s0">import </span><span class="s1">org</span><span class="s2">.</span><span class="s1">springframework</span><span class="s2">.</span><span class="s1">beans</span><span class="s2">.</span><span class="s1">factory</span><span class="s2">.</span><span class="s1">annotation</span><span class="s2">.</span><span class="s1">Autowired</span><span class="s2">;</span>
+<span class="s0">import </span><span class="s1">org</span><span class="s2">.</span><span class="s1">springframework</span><span class="s2">.</span><span class="s1">stereotype</span><span class="s2">.</span><span class="s1">Service</span><span class="s2">;</span>
+<span class="s0">import </span><span class="s1">java</span><span class="s2">.</span><span class="s1">time</span><span class="s2">.</span><span class="s1">LocalDate</span><span class="s2">;</span>
+<span class="s0">import </span><span class="s1">java</span><span class="s2">.</span><span class="s1">util</span><span class="s2">.</span><span class="s1">List</span><span class="s2">;</span>
+<span class="s0">import </span><span class="s1">java</span><span class="s2">.</span><span class="s1">util</span><span class="s2">.</span><span class="s1">Optional</span><span class="s2">;</span>
+
+<span class="s1">@Service</span>
+<span class="s0">public class </span><span class="s1">BorrowService </span><span class="s2">{</span>
+    <span class="s1">@Autowired</span>
+    <span class="s0">private </span><span class="s1">BorrowTransactionRepository transactionRepository</span><span class="s2">;</span>
+
+    <span class="s1">@Autowired</span>
+    <span class="s0">private </span><span class="s1">BookRepository bookRepository</span><span class="s2">;</span>
+
+    <span class="s1">@Autowired</span>
+    <span class="s0">private </span><span class="s1">UserRepository userRepository</span><span class="s2">;</span>
+
+    <span class="s0">public </span><span class="s1">List</span><span class="s2">&lt;</span><span class="s1">BorrowTransaction</span><span class="s2">&gt; </span><span class="s1">getAllTransactions</span><span class="s2">() {</span>
+        <span class="s0">return </span><span class="s1">transactionRepository</span><span class="s2">.</span><span class="s1">findAll</span><span class="s2">();</span>
+    <span class="s2">}</span>
+
+    <span class="s0">public </span><span class="s1">Optional</span><span class="s2">&lt;</span><span class="s1">BorrowTransaction</span><span class="s2">&gt; </span><span class="s1">getTransactionById</span><span class="s2">(</span><span class="s1">String id</span><span class="s2">) {</span>
+        <span class="s0">return </span><span class="s1">transactionRepository</span><span class="s2">.</span><span class="s1">findById</span><span class="s2">(</span><span class="s1">id</span><span class="s2">);</span>
+    <span class="s2">}</span>
+
+    <span class="s0">public </span><span class="s1">BorrowTransaction borrowBook</span><span class="s2">(</span><span class="s1">String userId</span><span class="s2">, </span><span class="s1">String bookId</span><span class="s2">, </span><span class="s0">int </span><span class="s1">durationDays</span><span class="s2">) {</span>
+        <span class="s3">// 1. Verify user exists and check limit</span>
+        <span class="s1">User user </span><span class="s2">= </span><span class="s1">userRepository</span><span class="s2">.</span><span class="s1">findById</span><span class="s2">(</span><span class="s1">userId</span><span class="s2">)</span>
+                <span class="s2">.</span><span class="s1">orElseThrow</span><span class="s2">(() </span><span class="s1">-&gt; </span><span class="s0">new </span><span class="s1">IllegalArgumentException</span><span class="s2">(</span><span class="s4">&quot;User not found: &quot; </span><span class="s2">+ </span><span class="s1">userId</span><span class="s2">));</span>
+        
+        <span class="s0">if </span><span class="s2">(</span><span class="s1">user </span><span class="s0">instanceof </span><span class="s1">RegularUser</span><span class="s2">) {</span>
+            <span class="s1">RegularUser regUser </span><span class="s2">= (</span><span class="s1">RegularUser</span><span class="s2">) </span><span class="s1">user</span><span class="s2">;</span>
+            <span class="s0">long </span><span class="s1">activeBorrows </span><span class="s2">= </span><span class="s1">transactionRepository</span><span class="s2">.</span><span class="s1">findAll</span><span class="s2">().</span><span class="s1">stream</span><span class="s2">()</span>
+                    <span class="s2">.</span><span class="s1">filter</span><span class="s2">(</span><span class="s1">t -&gt; t</span><span class="s2">.</span><span class="s1">getUserId</span><span class="s2">().</span><span class="s1">equals</span><span class="s2">(</span><span class="s1">userId</span><span class="s2">) &amp;&amp; !</span><span class="s1">t</span><span class="s2">.</span><span class="s1">isReturned</span><span class="s2">())</span>
+                    <span class="s2">.</span><span class="s1">count</span><span class="s2">();</span>
+            <span class="s0">if </span><span class="s2">(</span><span class="s1">activeBorrows </span><span class="s2">&gt;= </span><span class="s1">regUser</span><span class="s2">.</span><span class="s1">getMaxBooksAllowed</span><span class="s2">()) {</span>
+                <span class="s0">throw new </span><span class="s1">IllegalStateException</span><span class="s2">(</span><span class="s4">&quot;User has reached their borrowing limit of &quot; </span><span class="s2">+ </span><span class="s1">regUser</span><span class="s2">.</span><span class="s1">getMaxBooksAllowed</span><span class="s2">() + </span><span class="s4">&quot; books.&quot;</span><span class="s2">);</span>
+            <span class="s2">}</span>
+        <span class="s2">}</span>
+
+        <span class="s3">// 2. Verify book exists and is available</span>
+        <span class="s1">Book book </span><span class="s2">= </span><span class="s1">bookRepository</span><span class="s2">.</span><span class="s1">findById</span><span class="s2">(</span><span class="s1">bookId</span><span class="s2">)</span>
+                <span class="s2">.</span><span class="s1">orElseThrow</span><span class="s2">(() </span><span class="s1">-&gt; </span><span class="s0">new </span><span class="s1">IllegalArgumentException</span><span class="s2">(</span><span class="s4">&quot;Book not found: &quot; </span><span class="s2">+ </span><span class="s1">bookId</span><span class="s2">));</span>
+        <span class="s0">if </span><span class="s2">(!</span><span class="s1">book</span><span class="s2">.</span><span class="s1">isAvailable</span><span class="s2">()) {</span>
+            <span class="s0">throw new </span><span class="s1">IllegalStateException</span><span class="s2">(</span><span class="s4">&quot;Book is already borrowed: &quot; </span><span class="s2">+ </span><span class="s1">book</span><span class="s2">.</span><span class="s1">getTitle</span><span class="s2">());</span>
+        <span class="s2">}</span>
+
+        <span class="s3">// 3. Mark book unavailable</span>
+        <span class="s1">book</span><span class="s2">.</span><span class="s1">setAvailable</span><span class="s2">(</span><span class="s0">false</span><span class="s2">);</span>
+        <span class="s1">bookRepository</span><span class="s2">.</span><span class="s1">save</span><span class="s2">(</span><span class="s1">book</span><span class="s2">);</span>
+
+        <span class="s3">// 4. Create and save transaction</span>
+        <span class="s1">String txId </span><span class="s2">= </span><span class="s4">&quot;T&quot; </span><span class="s2">+ </span><span class="s1">System</span><span class="s2">.</span><span class="s1">currentTimeMillis</span><span class="s2">() % </span><span class="s5">1000000</span><span class="s2">;</span>
+        <span class="s1">LocalDate borrowDate </span><span class="s2">= </span><span class="s1">LocalDate</span><span class="s2">.</span><span class="s1">now</span><span class="s2">();</span>
+        <span class="s1">LocalDate dueDate </span><span class="s2">= </span><span class="s1">borrowDate</span><span class="s2">.</span><span class="s1">plusDays</span><span class="s2">(</span><span class="s1">durationDays</span><span class="s2">);</span>
+        <span class="s1">BorrowTransaction tx </span><span class="s2">= </span><span class="s0">new </span><span class="s1">BorrowTransaction</span><span class="s2">(</span><span class="s1">txId</span><span class="s2">, </span><span class="s1">userId</span><span class="s2">, </span><span class="s1">bookId</span><span class="s2">, </span><span class="s1">borrowDate</span><span class="s2">, </span><span class="s1">dueDate</span><span class="s2">, </span><span class="s0">false</span><span class="s2">, </span><span class="s5">0.0</span><span class="s2">);</span>
+        
+        <span class="s0">return </span><span class="s1">transactionRepository</span><span class="s2">.</span><span class="s1">save</span><span class="s2">(</span><span class="s1">tx</span><span class="s2">);</span>
+    <span class="s2">}</span>
+
+    <span class="s0">public </span><span class="s1">BorrowTransaction returnBook</span><span class="s2">(</span><span class="s1">String transactionId</span><span class="s2">) {</span>
+        <span class="s1">BorrowTransaction tx </span><span class="s2">= </span><span class="s1">transactionRepository</span><span class="s2">.</span><span class="s1">findById</span><span class="s2">(</span><span class="s1">transactionId</span><span class="s2">)</span>
+                <span class="s2">.</span><span class="s1">orElseThrow</span><span class="s2">(() </span><span class="s1">-&gt; </span><span class="s0">new </span><span class="s1">IllegalArgumentException</span><span class="s2">(</span><span class="s4">&quot;Transaction not found: &quot; </span><span class="s2">+ </span><span class="s1">transactionId</span><span class="s2">));</span>
+        
+        <span class="s0">if </span><span class="s2">(</span><span class="s1">tx</span><span class="s2">.</span><span class="s1">isReturned</span><span class="s2">()) {</span>
+            <span class="s0">throw new </span><span class="s1">IllegalStateException</span><span class="s2">(</span><span class="s4">&quot;Book is already marked returned.&quot;</span><span class="s2">);</span>
+        <span class="s2">}</span>
+
+        <span class="s3">// Mark book available</span>
+        <span class="s1">Book book </span><span class="s2">= </span><span class="s1">bookRepository</span><span class="s2">.</span><span class="s1">findById</span><span class="s2">(</span><span class="s1">tx</span><span class="s2">.</span><span class="s1">getBookId</span><span class="s2">()).</span><span class="s1">orElse</span><span class="s2">(</span><span class="s0">null</span><span class="s2">);</span>
+        <span class="s0">if </span><span class="s2">(</span><span class="s1">book </span><span class="s2">!= </span><span class="s0">null</span><span class="s2">) {</span>
+            <span class="s1">book</span><span class="s2">.</span><span class="s1">setAvailable</span><span class="s2">(</span><span class="s0">true</span><span class="s2">);</span>
+            <span class="s1">bookRepository</span><span class="s2">.</span><span class="s1">save</span><span class="s2">(</span><span class="s1">book</span><span class="s2">);</span>
+        <span class="s2">}</span>
+
+        <span class="s3">// Calculate fine (Polymorphism)</span>
+        <span class="s1">User user </span><span class="s2">= </span><span class="s1">userRepository</span><span class="s2">.</span><span class="s1">findById</span><span class="s2">(</span><span class="s1">tx</span><span class="s2">.</span><span class="s1">getUserId</span><span class="s2">()).</span><span class="s1">orElse</span><span class="s2">(</span><span class="s0">null</span><span class="s2">);</span>
+        <span class="s1">FineCalculator calculator </span><span class="s2">= </span><span class="s0">new </span><span class="s1">RegularUserFineCalculator</span><span class="s2">(); </span><span class="s3">// default</span>
+        <span class="s0">if </span><span class="s2">(</span><span class="s1">user </span><span class="s0">instanceof </span><span class="s1">RegularUser</span><span class="s2">) {</span>
+            <span class="s1">RegularUser regUser </span><span class="s2">= (</span><span class="s1">RegularUser</span><span class="s2">) </span><span class="s1">user</span><span class="s2">;</span>
+            <span class="s0">if </span><span class="s2">(</span><span class="s4">&quot;PREMIUM&quot;</span><span class="s2">.</span><span class="s1">equalsIgnoreCase</span><span class="s2">(</span><span class="s1">regUser</span><span class="s2">.</span><span class="s1">getMembershipType</span><span class="s2">())) {</span>
+                <span class="s1">calculator </span><span class="s2">= </span><span class="s0">new </span><span class="s1">PremiumUserFineCalculator</span><span class="s2">();</span>
+            <span class="s2">}</span>
+        <span class="s2">}</span>
+        
+        <span class="s0">double </span><span class="s1">fine </span><span class="s2">= </span><span class="s1">calculator</span><span class="s2">.</span><span class="s1">calculateFine</span><span class="s2">(</span><span class="s1">tx</span><span class="s2">.</span><span class="s1">getReturnDate</span><span class="s2">(), </span><span class="s1">LocalDate</span><span class="s2">.</span><span class="s1">now</span><span class="s2">());</span>
+        
+        <span class="s1">tx</span><span class="s2">.</span><span class="s1">setReturned</span><span class="s2">(</span><span class="s0">true</span><span class="s2">);</span>
+        <span class="s1">tx</span><span class="s2">.</span><span class="s1">setReturnDate</span><span class="s2">(</span><span class="s1">LocalDate</span><span class="s2">.</span><span class="s1">now</span><span class="s2">()); </span><span class="s3">// set actual return date</span>
+        <span class="s1">tx</span><span class="s2">.</span><span class="s1">setFinePaid</span><span class="s2">(</span><span class="s1">fine</span><span class="s2">);</span>
+        
+        <span class="s0">return </span><span class="s1">transactionRepository</span><span class="s2">.</span><span class="s1">save</span><span class="s2">(</span><span class="s1">tx</span><span class="s2">);</span>
+    <span class="s2">}</span>
+<span class="s2">}</span>
+</pre>
+</body>
+</html>
